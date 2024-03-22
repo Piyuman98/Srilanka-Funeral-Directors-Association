@@ -495,10 +495,11 @@ section {
 .hero {
   width: 100%;
   min-height: 100vh;
-  background: url("../img/hero-bg.jpg") top center;
+  background: url("../img/home6.jpg") left center;
   background-size: cover;
+  background-repeat: no-repeat;
   position: relative;
-  padding: 120px 0;
+  padding: 100px 0;
   z-index: 3;
 }
 
@@ -631,7 +632,7 @@ section {
 
 .why-us h4 {
   font-size: 18px;
-  font-weight: 400;
+  font-weight: 700;
   color: #29486a;
   font-family: var(--font-secondary);
 }
@@ -656,7 +657,7 @@ section {
 }
 
 .why-us .swiper-pagination {
-  margin-top: 30px;
+  margin-top: 100px;
   position: relative;
 }
 
@@ -761,7 +762,7 @@ section {
 # Call To Action Section
 --------------------------------------------------------------*/
 .call-to-action {
-  background: linear-gradient(rgba(27, 47, 69, 0.8), rgba(27, 47, 69, 0.8)), url("../img/3.jpg") center center;
+  background: url("../img/homeee.png") center center;
   background-size: cover;
   padding: 100px 0;
 }
@@ -829,7 +830,9 @@ section {
 
 .features .phone-wrap {
   position: absolute;
-  right: 0;
+  
+  left: 0;
+  top: -100px;
 }
 
 @media (max-width: 768px) {
@@ -839,12 +842,14 @@ section {
 }
 
 .features .phone-wrap img {
-  width: 340px;
+  width: 800px;
+  max-width: 940px;
 }
 
 @media (max-width: 992px) {
   .features .phone-wrap img {
     margin-top: 30px;
+    max-width: 100%;
   }
 }
 
@@ -857,7 +862,9 @@ section {
 .features .details {
   margin-top: 80px;
   padding: 120px 0;
-  background-color: #f7f9fc;
+  background: linear-gradient(rgba(150, 181, 213, 0.8), rgba(143, 187, 234, 0.8)),url("../img/home\ 0.png") center center;
+  background-size: cover;
+ 
 }
 
 .features .details h4 {
@@ -2176,3 +2183,48 @@ section {
   font-size: 13px;
   color: var(--color-secondary);
 }
+.custom-hr {
+  border: none;
+  height: 3px; /* Adjust the thickness of the line */
+  background-color: #8b6505; /* Change the color of the line */
+}
+.custom-button {
+  display: inline-block;
+  padding: 10px 50px;
+  font-family: 'Open Sans';
+  font-weight: 700;
+  font-size: 18px;
+  text-align: center;
+  text-decoration: none;
+  color: #ffffff;
+  background-color: #9a855a;
+  border: none;
+  border-radius: 50px; /* Add rounded corners */
+  cursor: pointer;
+}
+
+.custom-button:hover {
+  background-color: #103860;
+}
+
+.image-with-decoration {
+  position: relative;
+  display: inline-block;
+}
+
+.image {
+  max-width: 100%;
+  display: block;
+}
+
+.decoration {
+  position: absolute;
+  top: 0;
+  right: -50px; /* Adjust the distance of the decoration from the image */
+  width: 40px; /* Adjust the width of the decoration */
+  height: 100%;
+  background-color: #9a855a; /* Adjust the color of the decoration */
+  z-index: -1; /* Push the decoration behind the image */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
