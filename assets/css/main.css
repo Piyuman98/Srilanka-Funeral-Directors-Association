@@ -871,7 +871,7 @@ section {
 .features .details {
   margin-top: 80px;
   padding: 100px 0;
-  background: linear-gradient(rgba(189, 194, 198, 0.8), rgba(168, 173, 178, 0.8)),url("../img/home3.png") ;
+  background:url("../img/home3.png") left;
   background-size: cover;
  
 }
@@ -2237,3 +2237,9 @@ section {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
 
+.custom-hr1 {
+  border: none;
+  width: 60%;
+  height: 3px; /* Adjust the thickness of the line */
+  background-color: #f6f5f3; /* Change the color of the line */
+}
