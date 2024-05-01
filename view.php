@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 
 @include 'config.php';
@@ -22,159 +21,371 @@ if(isset($_POST['add_product'])){
 };
 
 if(isset($_GET['delete'])){
-   $delete_id = $_GET['delete'];
-   $delete_query = mysqli_query($conn, "DELETE FROM `products` WHERE id = $delete_id AND user_id = '{$_SESSION['user_id']}'") or die('query failed');
-   if($delete_query){
-      header('location:view.php');
-      $message[] = 'product has been deleted';
-   }else{
-      header('location:view.php');
-      $message[] = 'product could not be deleted';
-   };
+  $delete_id = $_GET['delete'];
+  $delete_query = mysqli_query($conn, "DELETE FROM `products` WHERE id = $delete_id AND user_id = '{$_SESSION['user_id']}'") or die('query failed');
+  if($delete_query){
+     header('location:view.php');
+     $message[] = 'product has been deleted';
+  }else{
+     header('location:view.php');
+     $message[] = 'product could not be deleted';
+  };
 };
 
-if(isset($_POST['update_product'])){
-   $update_p_id = $_POST['update_p_id'];
-   $update_p_name = $_POST['update_p_name'];
-   $update_p_price = $_POST['update_p_price'];
-   $update_p_image = $_FILES['update_p_image']['name'];
-   $update_p_image_tmp_name = $_FILES['update_p_image']['tmp_name'];
-   $update_p_image_folder = 'uploaded_img/'.$update_p_image;
-
-   $update_query = mysqli_query($conn, "UPDATE `products` SET name = '$update_p_name', price = '$update_p_price', image = '$update_p_image' WHERE id = '$update_p_id' AND user_id = '{$_SESSION['user_id']}'");
-
-   if($update_query){
-      move_uploaded_file($update_p_image_tmp_name, $update_p_image_folder);
-      $message[] = 'product updated successfully';
-      header('location:view.php');
-   }else{
-      $message[] = 'product could not be updated';
-      header('location:view.php');
-   }
-
-}
-
+$select_user_products = mysqli_query($conn, "SELECT * FROM `products` WHERE user_id = '{$_SESSION['user_id']}' ORDER BY id DESC");
+$select_other_products = mysqli_query($conn, "SELECT * FROM `products` WHERE user_id != '{$_SESSION['user_id']}' ORDER BY id DESC");
+$user_products = mysqli_fetch_all($select_user_products, MYSQLI_ASSOC);
+$other_products = mysqli_fetch_all($select_other_products, MYSQLI_ASSOC);
+$products = array_merge($user_products, $other_products);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-   <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>admin panel</title>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-   <!-- font awesome cdn link  -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>Srilanka Funeral Directors Association</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
 
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/style.css">
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: Nova
+  * Template URL: https://bootstrapmade.com/nova-bootstrap-business-template/
+  * Updated: Mar 17 2024 with Bootstrap v5.3.3
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+  <style>
+    .product-image {
+        width: 150px; /* Set your desired width */
+        height: 100px; /* Set your desired height */
+        object-fit: cover; /* Optional: Ensures the image covers the entire area */
+    }
+    #toggleFormBtn {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
+
+    #toggleFormBtn:hover {
+        background-color: #0056b3;
+    }
+</style>
 </head>
-<body>
-   
-<?php
 
-if(isset($message)){
-   foreach($message as $message){
-      echo '<div class="message"><span>'.$message.'</span> <i class="fas fa-times" onclick="this.parentElement.style.display = `none`;"></i> </div>';
-   };
-};
+<body class="page-index">
 
-?>
+  <!-- ======= Header ======= -->
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <img src="assets/img/rrrrrrr.png" width="8%">
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+      
+      <a href="index.html" class="logo d-flex align-items-center">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.png" alt=""> -->
+        
+        <h1 class="d-flex align-items-center">SFDA</h1>
+      </a>
 
+      <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+      <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a href="index.php" class="active">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="team.html">Directory </a></li>
+          <li><a href="blog.html">Blog</a></li>
+
+          <li><a href="contact.html">Contact</a></li>
+
+          <li><a href="login.php">Member Login</a></li>
+        </ul>
+      </nav><!-- .navbar -->
+
+    </div>
+  </header><!-- End Header -->
+
+  <!-- ======= Hero Section ======= -->
+  <section id="hero" class="hero d-flex align-items-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-4">
+          <h2 data-aos="fade-up">Srilanka Funeral Directors Association</h2>
+          <blockquote data-aos="fade-up" data-aos-delay="100">
+            <p>Our role is to provide support and guidance to funeral firms and the bereaved families in their care. 
+            </p>
+          </blockquote>
+          <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
+            <a href="#about" class="btn-get-started">Get Started</a>
+            <a href="https://www.youtube.com/watch?v=LXb3EKWsInQ" class="glightbox btn-watch-video d-flex align-items-center"><i class="bi bi-play-circle"></i><span>Watch Video</span></a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section><!-- End Hero Section -->
+
+  <main id="main">
 <br>
-<br>
+    
+ <!-- Header, navigation, hero section, etc. -->
+ <center>
+ <button id="toggleFormBtn" class="btn">Add Product</button>
+ <div id="addProductForm" style="display: none;">
 
-<div class="container">
+    <!-- add_product_form.php -->
+<style>
+   /* Custom styles for the table */
+   .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
 
-<section>
+    .table th,
+    .table td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .table th {
+        background-color: #f2f2f2;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f2f2f2;
+    }
+
+     .table {
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+    }
+
+    .table th,
+    .table td {
+        font-weight: normal;
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    /* Custom styles for input fields */
+    .box {
+        width: 50%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    /* Custom style for buttons */
+    .btn {
+        padding: 10px 20px;
+        background-color: #255bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+        text-decoration: none;
+    }
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+    /* Custom style for cancel button */
+    #cancelBtn {
+        padding: 10px 20px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+        text-decoration: none;
+    }
+
+    #cancelBtn:hover {
+        background-color: #bb2d3b;
+    }
+    
+</style>
 
 <form action="" method="post" class="add-product-form" enctype="multipart/form-data">
-   <h3>add a new product</h3>
-   <input type="text" name="p_name" placeholder="enter the product name" class="box" required>
-   <input type="flot" name="p_price"  placeholder="enter the product price" class="box" required>
-   <input type="file" name="p_image" accept="image/png, image/jpg, image/jpeg" class="box" required>
-   <input type="submit" value="add the product" name="add_product" class="btn">
+    <h3>ADD a new product</h3>
+    <input type="text" name="p_name" placeholder="Enter the product name" class="box" required>
+    <input type="number" name="p_price" placeholder="Enter the product price" class="box" required>
+    <input type="file" name="p_image" accept="image/png, image/jpg, image/jpeg" class="box" required><br>
+    <input type="submit" value="Add Product" name="add_product" class="btn">
+    <button type="button" id="cancelBtn">Cancel</button>
+    <a href="view.php" class="btn">Back to View Page</a>
 </form>
+<br><br>
 
-</section>
+<script>
+    // JavaScript to handle cancel button click
+    document.getElementById("cancelBtn").addEventListener("click", function() {
+        document.querySelector(".add-product-form").reset();
+    });
+</script>
 
-<section class="display-product-table">
+ </center>
+<script>
+    document.getElementById('toggleFormBtn').addEventListener('click', function() {
+        var form = document.getElementById('addProductForm');
+        form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+    });
+</script>
 
-   <table>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Image</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $count = 1;
+                            foreach($products as $row){
+                                echo "<tr>";
+                                echo "<td>{$count}</td>";
+                                echo "<td>{$row['name']}</td>";
+                                echo "<td>{$row['price']}/-</td>";
+                                echo "<td><img src='uploaded_img/{$row['image']}' class='product-image' alt='{$row['name']}'></td>";
+                                echo "<td>";
+                                if($row['user_id'] == $_SESSION['user_id']){
+                                    echo "<a href='view.php?delete={$row['id']}' class='delete-btn' onclick='return confirm(`Are you sure you want to delete this product?`);'><i class='fas fa-trash'></i> Delete</a>";
+                                }
+                                echo "</td>";
+                                echo "</tr>";
+                                $count++;
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-      <thead>
-         <th>product image</th>
-         <th>product name</th>
-         <th>product price</th>
-         <th>action</th>
-      </thead>
+    <!-- Footer, scripts, etc. -->
+  </main><!-- End #main -->
 
-      <tbody>
-         <?php
-         
-            $select_products = mysqli_query($conn, "SELECT * FROM `products`");
-            if(mysqli_num_rows($select_products) > 0){
-               while($row = mysqli_fetch_assoc($select_products)){
-         ?>
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
 
-         <tr>
-            <td><img src="uploaded_img/<?php echo $row['image']; ?>" height="100" alt=""></td>
-            <td><?php echo $row['name']; ?></td>
-            <td>$<?php echo $row['price']; ?>/-</td>
-            <td>
-               <a href="view.php?delete=<?php echo $row['id']; ?>" class="delete-btn" onclick="return confirm('are your sure you want to delete this?');"> <i class="fas fa-trash"></i> delete </a>
-               <?php if($row['user_id'] == $_SESSION['user_id']): ?>
-               <a href="view.php?edit=<?php echo $row['id']; ?>" class="option-btn"> <i class="fas fa-edit"></i> update </a>
-               <?php endif; ?>
-            </td>
-         </tr>
+    <div class="footer-content">
+      <div class="container">
+        <div class="row gy-4">
+          <div class="col-lg-5 col-md-12 footer-info">
+            <a href="index.html" class="logo d-flex align-items-center">
+              <span>SFDA</span>
+            </a>
+            <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita valies darta donna mare fermentum iaculis eu non diam phasellus.</p>
+            <div class="social-links d-flex  mt-3">
+              <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+              <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+              <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+            </div>
+          </div>
 
-         <?php
-            };    
-            }else{
-               echo "<div class='empty'>no product added</div>";
-            };
-         ?>
-      </tbody>
-   </table>
+          <div class="col-lg-2 col-6 footer-links">
+            <h4>Useful Links</h4>
+            <ul>
+              <li><i class="bi bi-dash"></i> <a href="#">Home</a></li>
+              <li><i class="bi bi-dash"></i> <a href="#">About us</a></li>
+              <li><i class="bi bi-dash"></i> <a href="#">Services</a></li>
+              <li><i class="bi bi-dash"></i> <a href="#">Terms of service</a></li>
+              <li><i class="bi bi-dash"></i> <a href="#">Privacy policy</a></li>
+            </ul>
+          </div>
 
-</section>
+          <div class="col-lg-2 col-6 footer-links">
+            <h4>Our Services</h4>
+            <ul>
+              <li><i class="bi bi-dash"></i> <a href="#">Web Design</a></li>
+              <li><i class="bi bi-dash"></i> <a href="#">Web Development</a></li>
+              <li><i class="bi bi-dash"></i> <a href="#">Product Management</a></li>
+              <li><i class="bi bi-dash"></i> <a href="#">Marketing</a></li>
+              <li><i class="bi bi-dash"></i> <a href="#">Graphic Design</a></li>
+            </ul>
+          </div>
 
-<section class="edit-form-container">
+          <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
+            <h4>Contact Us</h4>
+            <p>
+              A108 Adam Street <br>
+              New York, NY 535022<br>
+              United States <br><br>
+              <strong>Phone:</strong> +1 5589 55488 55<br>
+              <strong>Email:</strong> info@example.com<br>
+            </p>
 
-   <?php
-   
-   if(isset($_GET['edit'])){
-      $edit_id = $_GET['edit'];
-      $edit_query = mysqli_query($conn, "SELECT * FROM `products` WHERE id = $edit_id AND user_id = '{$_SESSION['user_id']}'");
-      if(mysqli_num_rows($edit_query) > 0){
-         while($fetch_edit = mysqli_fetch_assoc($edit_query)){
-   ?>
+          </div>
 
-   <form action="" method="post" enctype="multipart/form-data">
-      <img src="uploaded_img/<?php echo $fetch_edit['image']; ?>" height="100" alt="">
-      <input type="hidden" name="update_p_id" value="<?php echo $fetch_edit['id']; ?>">
-      <input type="text" class="box" required name="update_p_name" value="<?php echo $fetch_edit['name']; ?>">
-      <input type="number" min="0" class="box" required name="update_p_price" value="<?php echo $fetch_edit['price']; ?>">
-      <input type="file" class="box" required name="update_p_image" accept="image/png, image/jpg, image/jpeg">
-      <input type="submit" value="update the product" name="update_product" class="btn">
-      <input type="reset" value="cancel" id="close-edit" class="option-btn">
-   </form
-   <?php
-            };
-         };
-         echo "<script>document.querySelector('.edit-form-container').style.display = 'flex';</script>";
-      };
-   ?>
+        </div>
+      </div>
+    </div>
 
-</section>
+    
+  </footer><!-- End Footer --><!-- End Footer -->
 
-</div>
+  <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-<!-- custom js file link  -->
-<script src="js/script.js"></script>
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
 
 </body>
+
 </html>

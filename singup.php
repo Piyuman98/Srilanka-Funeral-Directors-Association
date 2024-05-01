@@ -1,25 +1,28 @@
 <?php
 session_start();
-include 'config.php';
 
-$message = ''; // Initialize the $message variable
+@include 'config.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = $_POST['password'];
+if(isset($_POST['signup'])){
+   $username = mysqli_real_escape_string($conn, $_POST['username']);
+   $email = mysqli_real_escape_string($conn, $_POST['email']);
+   $password = mysqli_real_escape_string($conn, $_POST['password']);
 
-    $result = mysqli_query($conn, "SELECT * FROM users WHERE username='$username'");
-    $user = mysqli_fetch_assoc($result);
+   // Password hashing
+   $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        header('Location: view.php');
-        exit;
-    } else {
-        $message = 'Invalid username or password.';
-    }
+   $insert_query = mysqli_query($conn, "INSERT INTO `users`(`username`, `password`) VALUES('$username', '$hashed_password')") or die('query failed');
+
+   if($insert_query){
+      $_SESSION['message'] = 'Signup successful. Please login.';
+      header('location: login.php');
+   }else{
+      $_SESSION['message'] = 'Could not sign up. Please try again.';
+   }
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -32,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <meta name="viewport" content="initial-scale=1, maximum-scale=1">
       <!-- site metas -->
-      <title>Login Page</title>
+      <title>Sing UP Page</title>
       <meta name="keywords" content="">
       <meta name="description" content="">
       <meta name="author" content="">
@@ -195,16 +198,15 @@ button{
         <div class="shape"></div>
         <div class="shape"></div>
     </div>
-    <form method="post" action="">
-        <h3>Login Here</h3>
-        <center><div style="color:red;"><?php echo $message; ?></div></center>
+    <form action="" method="post" class="signup-form">
+        <h3>Sign Up Here</h3>
+        
         <label for="username">Username</label>
-        <input type="text" placeholder="User name" name="username" id="username">
+        <input type="text" placeholder="User name" name="username" id="username" required>
 
         <label for="password">Password</label>
-        <input type="password" placeholder="Password"  name="password" id="password">
-        <input type="submit" value="Login">
-
+        <input type="password" placeholder="Password"  name="password" id="password" required>
+        <input type="submit" name="signup" value="Sign Up">
         
         
     </form>
